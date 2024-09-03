@@ -1,5 +1,5 @@
 
-#Phelps et al shared code: isotopic niches / liveilhood characteristics
+#Phelps et al shared code: isotopic niches & associated liveilhood characteristics
 rm(list=ls()) #clear environment
 
 ```{r}
@@ -4002,4 +4002,128 @@ lmmix_e_13C = lm(mix_e_select$avg_d13C_org~mix_e_select$Date_mean)
 lmmix_s = lm(mix_s_select$avg_d15N~mix_s_select$Date_mean)
 lmmix_s_13C = lm(mix_s_select$avg_d13C_org~mix_s_select$Date_mean)
 ########################
+```
+
+
+```{r}
+
+#FIGURE 4
+library(ecospat)
+
+#SPATIAL PROJECTION
+brick<-brick(bioclim_bio_[[1]],bioclim_bio_[[2]],bioclim_bio_[[3]],
+             bioclim_bio_[[4]],bioclim_bio_[[5]],bioclim_bio_[[6]],
+             bioclim_bio_[[7]],bioclim_bio_[[8]],bioclim_bio_[[9]],
+             bioclim_bio_[[10]],bioclim_bio_[[11]],bioclim_bio_[[12]],
+             bioclim_bio_[[13]],bioclim_bio_[[14]],bioclim_bio_[[15]],
+             bioclim_bio_[[16]],bioclim_bio_[[17]],bioclim_bio_[[18]],
+             bioclim_bio_[[19]])
+env_bkg<-na.exclude(values(brick))
+pca.occ<-dudi.pca(env_bkg,scannf=F,nf=2)
+scores.globclim <- pca.occ$li
+#
+humans_occ = humans_corr
+humans_occ$bioclim1<-NULL
+humans_occ$bioclim12<-NULL
+humans_occ$bioclim15<-NULL
+test<-length(humans_occ)
+for(i in 1:19){humans_occ[,test+i] <- extract(brick[[i]],humans_occ[,c("Longitude","Latitude")],
+                                    method='simple', buffer=NULL, 
+                                    small=FALSE, cellnumbers=FALSE,fun=NULL,
+                                    na.arm=TRUE, layer, df=FALSE,factors=FALSE)}
+colnames(humans_occ)[45:63]<-c("Bio1","Bio2","Bio3","Bio4","Bio5","Bio6","Bio7","Bio8","Bio9","Bio10","Bio11","Bio12","Bio13","Bio14","Bio15","Bio16","Bio17","Bio18","Bio19")
+#
+nicheAquatic <- rbind(humanyellow[,1:44],humangray[,1:44])
+nichePastoral <- humanblue[,1:44]
+nicheCultivation <- humangreen[,1:44]
+nicheHGF <- rbind(humanorangeNorth[,1:44],humanredEgypt[,1:44],humanorangeSubsaharan[,1:44],humanred[,1:44],humangreenSouth[,1:44])
+#
+test=length(nicheAquatic)
+nicheAquatic <- rbind(humanyellow[,1:44],humangray[,1:44])
+domfirebrick_add<-domfirebrick[,c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org")]
+nicheAquatic2<-merge(nicheAquatic,domfirebrick_add,by.all=c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org"),all=TRUE)
+#
+nichePastoral <- humanblue[,1:44]
+domdodgerblue_add<-domdodgerblue[,c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org")]
+domforestgreenblue_add<-domforestgreenblue[,c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org")]
+nichePastoral2<-merge(nichePastoral,domdodgerblue_add,by.all=c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org"),all=TRUE)
+nichePastoral2<-merge(nichePastoral2,domforestgreenblue_add,by.all=c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org"),all=TRUE)
+#
+nicheCultivation <- humangreen[,1:44]
+domStockkeeping_add<-domStockkeeping[,c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org")]
+domforestgreen_add<-domforestgreen[,c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org")]
+nicheCultivation2<-merge(nicheCultivation,domStockkeeping_add,by.all=c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org"),all=TRUE)
+nicheCultivation2<-merge(nicheCultivation2,domforestgreen_add,by.all=c("Longitude","Latitude","Site","Site_Country","Date_max","Date_min","cluster8","Kingdom","Class","Family","Taxon","Taxon_Common_Name","Category","Lab_ID","Material_Type","avg_d13C_org","avg_d15N","avg_d13C_inorg","Age","CN_ratio","ID","Specimen_ID","Reference","DOI_or_Link","Date_mean","elev","adj_avg_d13C_org"),all=TRUE)
+#
+nicheHGF <- rbind(humanorangeNorth[,1:44],humanredEgypt[,1:44],humanorangeSubsaharan[,1:44],humanred[,1:44],humangreenSouth[,1:44])
+LivGroups = list()
+LivGroups[[1]]<-nicheAquatic2
+LivGroups[[2]]<-nichePastoral2
+LivGroups[[3]]<-nicheCultivation2
+LivGroups[[4]]<-nicheHGF
+for(t in 1:4){LivGroups[[t]][,c("bioclim1","bioclim12","bioclim15")]<-NULL}
+for(t in 1:4){
+test=length(LivGroups[[t]])
+for(i in 1:19){LivGroups[[t]][,test+i] <- extract(brick[[i]],LivGroups[[t]][,c("Longitude","Latitude")],
+                                    method='simple', buffer=NULL, 
+                                    small=FALSE, cellnumbers=FALSE,fun=NULL,
+                                    na.arm=TRUE, layer, df=FALSE,factors=FALSE)}
+colnames(LivGroups[[t]])[42:60]<-c("Bio1","Bio2","Bio3","Bio4","Bio5","Bio6","Bio7","Bio8","Bio9","Bio10","Bio11","Bio12","Bio13","Bio14","Bio15","Bio16","Bio17","Bio18","Bio19")}
+#
+#
+for(i in 1:19){humans_occ<-humans_occ[!is.na(humans_occ[,test+i]),]}
+for(t in 1:4){
+  for(i in 1:19){LivGroups[[t]]<-LivGroups[[t]][!is.na(LivGroups[[t]][,test+i]),]}}
+#
+scores.sp.F_agg_anal = suprow(pca.occ,humans_occ[,45:63])$li
+scores=list()
+for(t in 1:4){scores[[t]] = suprow(pca.occ,LivGroups[[t]][,42:60])$li}
+#
+z1_F <- ecospat.grid.clim.dyn(glob=scores.globclim,                 #extent
+                                    glob1 = scores.globclim,                #weighting
+                                    sp=scores.sp.F_agg_anal, R=100,
+                                    th.sp=0)
+z1Spaces=list()
+for(t in 1:4){
+  z1Spaces[[t]] <- ecospat.grid.clim.dyn(glob=scores.globclim,                 #extent
+                                    glob1 = scores.globclim,                #weighting
+                                    sp=scores[[t]], R=100,
+                                    th.sp=0)}
+#  
+geoz1_F <- ecospat.niche.zProjGeo(z1_F,brick,cor=FALSE)
+geoz1Spaces = list()
+for(t in 1:4){geoz1Spaces[[t]]<-ecospat.niche.zProjGeo(z1Spaces[[t]],brick,cor=FALSE)}
+#
+#
+rbPal=list() 
+rbPal[[1]] = colorRampPalette(c("black","yellow4","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow","yellow"))
+rbPal[[2]] = colorRampPalette(c("black","blue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue","dodgerblue"))
+rbPal[[3]] = colorRampPalette(c("black","forestgreen","green","green","green","green","green","green","green"))
+rbPal[[4]] = colorRampPalette(c("black","darkorange","orange","orange","orange"))
+rbPal[[5]] = colorRampPalette(c("black","firebrick","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red"))
+#
+geoz1Spaces2 = list()
+for(t in 1:4){geoz1Spaces2[[t]] <- raster::mask(geoz1Spaces[[t]],mask_of_africa) }
+geoz1Spaces = geoz1Spaces2
+#
+plot(geoz1_F,col=rbPal[[5]](500))
+pdf("/Users/lphelps/Desktop/UNIL/1_ms_AfriArch/0_Fig4_sep_AQUATIC.pdf")
+plot(mask_of_africa,border="black",col="gray30")
+plot(geoz1Spaces[[1]],col=rbPal[[1]](500),axes=FALSE,box=FALSE,add=TRUE)
+dev.off()
+#
+pdf("/Users/lphelps/Desktop/UNIL/1_ms_AfriArch/0_Fig4_sep_PASTORAL.pdf")
+plot(mask_of_africa,border="black",col="gray30")
+plot(geoz1Spaces[[2]],col=rbPal[[2]](500),axes=FALSE,box=FALSE,add=TRUE)
+dev.off()
+#
+pdf("/Users/lphelps/Desktop/UNIL/1_ms_AfriArch/0_Fig4_sep_CULTIVATION.pdf")
+plot(mask_of_africa,border="black",col="gray30")
+plot(geoz1Spaces[[3]],col=rbPal[[3]](500),axes=FALSE,box=FALSE,add=TRUE)
+dev.off()
+#
+pdf("/Users/lphelps/Desktop/UNIL/1_ms_AfriArch/0_Fig4_sep_HGterrestrial.pdf")
+plot(mask_of_africa,border="black",col="gray30")
+plot(geoz1Spaces[[4]],col=rbPal[[4]](500),axes=FALSE,box=FALSE,add=TRUE)
+dev.off()
 ```
